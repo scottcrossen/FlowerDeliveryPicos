@@ -47,7 +47,9 @@ ruleset manage_stores {
         "type": "install_rulesets_requested",
         "attrs": {
           "rids": [
-            "io.picolabs.subscription"
+            "io.picolabs.subscription",
+            "store",
+            "store_profile"
           ]
         }
       })

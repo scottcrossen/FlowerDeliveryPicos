@@ -48,7 +48,9 @@ ruleset manage_drivers {
         "attrs": {
           "rids": [
             "io.picolabs.subscription",
-            "gossip"
+            "gossip",
+            "driver",
+            "driver_profile"
           ]
         }
       })
