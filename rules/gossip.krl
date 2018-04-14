@@ -93,7 +93,7 @@ ruleset gossip {
       });
       // Select all rumors that need updates (from above) and send that.
       new_rumors = ent:rumors.filter(function(value, pico_id) {
-        not (seen >< pico_id) => false | true
+        not (seen >< pico_id)
       }).values(); // Only send values.
       // Handle the null case appropriately.
       (new_rumors.length() > 0) => new_rumors[0]{0} | (

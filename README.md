@@ -27,6 +27,8 @@ To start your *Flower Delivery* app:
 
 [Project Assignment](https://byu.instructure.com/courses/1420/assignments/66849)
 
+[KRL Documentation](https://picolabs.atlassian.net/wiki/spaces/docs/pages/1189890/KRL+Manual)
+
 ### Contributors
 
 1. Scott Leland Crossen  
