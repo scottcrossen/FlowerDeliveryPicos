@@ -1,7 +1,7 @@
 ruleset store_profile {
   meta {
     logging on
-    shares __testing
+    shares __testing, getProfile
     provides getProfile
   }
 

@@ -1,11 +1,17 @@
 ruleset order {
   meta {
     logging on
-    shares __testing
+    shares __testing, getCustomerContact, getAssignedDriver
+    provides getCustomerContact, getAssignedDriver
   }
 
   global {
     __testing = {
+      "queries": [ {
+        "name": "getCustomerContact"
+      }, {
+        "name": "getAssignedDriver"
+      } ]
     }
     defaultCustomerContact = {
       "name": null,

@@ -1,7 +1,7 @@
 ruleset driver_profile {
   meta {
     logging on
-    shares __testing
+    shares __testing, getProfile
     provides getProfile
   }
 
@@ -13,17 +13,19 @@ ruleset driver_profile {
       "events": [ {
         "domain": "driver_profile",
         "type": "update",
-        "attrs": [ "rating", "automaticBid", "automaticBidAmount" ]
+        "attrs": [ "rating", "automaticBid", "automaticBidAmount", "simulateDeliveryWait" ]
       } ]
     }
     defaultRating = 3
     defaultAutomaticBid = true
     defaultAutomaticBidAmount = 3.00
+    defaultSimulateDeliveryWait = 10.00
     getProfile = function() {
       ent:profile.defaultsTo({
         "rating": defaultRating,
         "automaticBid": defaultAutomaticBid,
-        "automaticBidAmount": defaultAutomaticBidAmount
+        "automaticBidAmount": defaultAutomaticBidAmount,
+        "simulateDeliveryWait": defaultSimulateDeliveryWait
       });
     }
   }
@@ -35,7 +37,12 @@ ruleset driver_profile {
       automaticBidAmount = event:attr("automaticBidAmount").defaultsTo(getProfile(){"automaticBidAmount"})
     }
     fired {
-      ent:profile := {"rating": rating, "automaticBid": automaticBid, "automaticBidAmount": automaticBidAmount}
+      ent:profile := {
+        "rating": rating,
+        "automaticBid": automaticBid,
+        "automaticBidAmount": automaticBidAmount,
+        "simulateDeliveryWait": simulateDeliveryWait
+      }
     }
   }
 }
