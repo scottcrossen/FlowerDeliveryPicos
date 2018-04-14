@@ -2,6 +2,7 @@ ruleset manage_stores {
   meta {
     logging on
     shares __testing
+    use module io.picolabs.wrangler alias wrangler
   }
 
   global {

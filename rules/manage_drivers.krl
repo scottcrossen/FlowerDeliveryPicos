@@ -2,6 +2,7 @@ ruleset manage_drivers {
   meta {
     logging on
     shares __testing
+    use module io.picolabs.wrangler alias wrangler
   }
 
   global {
@@ -19,13 +20,13 @@ ruleset manage_drivers {
       nextId = ent:currentChildId.defaultsTo(0).as("Number") + 1
       children = wrangler:children()
       exists = (children.filter(function(child) {
-        child{"name"} == "driver " + nextId.as("String")
+        child{"name"} == "Driver " + nextId.as("String")
       }).length() != 0)
     }
     fired {
       raise wrangler event "child_creation"
         attributes {
-          "name": "driver " + nextId.as("String"),
+          "name": "Driver " + nextId.as("String"),
           "color": "#00ff00"
         } if not exists;
       ent:currentChildId := nextId
@@ -47,7 +48,7 @@ ruleset manage_drivers {
         "attrs": {
           "rids": [
             "io.picolabs.subscription",
-            "gossip.krl"
+            "gossip"
           ]
         }
       })

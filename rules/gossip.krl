@@ -1,7 +1,6 @@
 ruleset gossip {
   meta {
     use module io.picolabs.subscription alias Subscriptions
-    use module temperature_store
     logging on
     shares __testing, getRumors, getPeers, getPeer, makeSeen, getAllSubscriptions
     provides getRumors, getPeers, getPeer, makeSeen, getAllSubscriptions
