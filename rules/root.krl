@@ -38,7 +38,7 @@ ruleset root {
   }
 
   rule children_driver_rules {
-    select when wrangler child_initialized where event:attr("rs_attrs"){"name"} == driverCollectionName
+    select when wrangler child_initialized where event:attr("rs_attrs"){"name"} == "Driver Collection"
     pre {
       eci = event:attr("eci")
     }
@@ -58,7 +58,7 @@ ruleset root {
   }
 
   rule children_store_rules {
-    select when wrangler child_initialized where event:attr("rs_attrs"){"name"} == storeCollectionName
+    select when wrangler child_initialized where event:attr("rs_attrs"){"name"} == "Flower Store Collection"
     pre {
       eci = event:attr("eci")
     }

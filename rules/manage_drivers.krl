@@ -17,6 +17,10 @@ ruleset manage_drivers {
     select when drivers new
     pre {
       nextId = ent:currentChildId.defaultsTo(0).as("Number") + 1
+      children = wrangler:children()
+      exists = (children.filter(function(child) {
+        child{"name"} == "driver " + nextId.as("String")
+      }).length() != 0)
     }
     fired {
       raise wrangler event "child_creation"

@@ -17,6 +17,10 @@ ruleset manage_stores {
     select when stores new
     pre {
       nextId = ent:currentChildId.defaultsTo(0).as("Number") + 1
+      children = wrangler:children()
+      exists = (children.filter(function(child) {
+        child{"name"} == "Store " + nextId.as("String")
+      }).length() != 0)
     }
     fired {
       raise wrangler event "child_creation"
