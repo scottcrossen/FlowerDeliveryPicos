@@ -1,5 +1,6 @@
 ruleset store {
   meta {
+    use module store_profile alias profile
     logging on
     shares __testing
   }
@@ -117,22 +118,62 @@ ruleset store {
       contactName = event:attr("contactName")
       contactPhoneNumber = event:attr("contactPhoneNumber")
       contactFlowerType = event:attr("contactFlowerType")
+      requireBid = profile:getProfile(){"requireBid"}
     }
-    every {
-      event:send({
-        "eci": eci,
-        "domain": "order",
-        "type": "update",
-        "attrs": {
-          "customerName": contactName,
-          "phoneNumber": contactPhoneNumber,
-          "flowerType": contactFlowerType
-        }
-      });
+    event:send({
+      "eci": eci,
+      "domain": "order",
+      "type": "update",
+      "attrs": {
+        "requireBid": requireBid,
+        "customerName": contactName,
+        "phoneNumber": contactPhoneNumber,
+        "flowerType": contactFlowerType
+      }
+    })
+    fired {
       raise store event "start_order" attributes {
         "eci": eci,
         "orderId": orderId
       } on final
     }
+  }
+
+  rule start_order {
+    select when store start_order
+    pre {
+      eci = event:attr("eci")
+      orderId = event:attr("orderId")
+    }
+    fired {
+      raise store event "propagate_order" attributes {
+        "eci": eci,
+        "orderId": orderId
+      };
+      schedule store event "fulfill_order" at time:add(time:now(), {"seconds": 5}) attributes {
+        "eci": eci,
+        "orderId": orderId
+      }
+    }
+  }
+
+  rule propagate_order {
+    select when store propagate_order
+    foreach getKnownDrivers() setting (driverEci)
+    pre {
+      eci = event:attr("eci")
+      orderId = event:attr("orderId")
+      minRating = profile:getProfile(){"minRating"}
+    }
+    event:send({
+      "eci": driverEci,
+      "domain": "driver",
+      "type": "new_order",
+      "attrs": {
+        "eci": eci,
+        "orderId": orderId,
+        "minRating": minRating
+      }
+    })
   }
 }

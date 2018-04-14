@@ -20,7 +20,8 @@ ruleset order {
     }
     defaultAssignedDriver = {
       "name": null,
-      "bid": -1
+      "bid": -1,
+      "requireBid": false
     }
     getCustomerContact = function() {
       ent:customerContact.defaultsTo(defaultCustomerContact);
@@ -38,6 +39,7 @@ ruleset order {
       flowerType = event:attr("flowerType").defaultsTo(getCustomerContact(){"flowerType"})
       driverName = event:attr("driverName").defaultsTo(getAssignedDriver(){"name"})
       bid = event:attr("bid").defaultsTo(getAssignedDriver(){"bid"})
+      requireBid = event:attr("requireBid").defaultsTo(getAssignedDriver(){"requireBid"})
     }
     fired {
       ent:customerContact := {
@@ -47,7 +49,8 @@ ruleset order {
       };
       ent:assignedDriver := {
         "name": driverName,
-        "bid": bid
+        "bid": bid,
+        "requireBid": requireBid
       }
     }
   }
@@ -58,12 +61,13 @@ ruleset order {
       driverName = event:attr("driverName").defaultsTo(null)
       bid = event:attr("bid").defaultsTo(-1)
       currentBid = getAssignedDriver(){"bid"}
+      requireBid = getAssignedDriver(){"requireBid"}
     }
     fired {
       ent:assignedDriver := {
         "name": driverName,
         "bid": bid
-      } if bid > currentBid && driverName != null
+      } if (currentBid == -1 || requireBid) && bid > currentBid && driverName != null
     }
   }
 }
