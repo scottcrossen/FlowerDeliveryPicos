@@ -1,0 +1,19 @@
+version: '2'
+services:
+  pico-engine:
+    build:
+      context: pico-engine/
+    ports:
+      - 8080:8080
+    links:
+      - "rulesets"
+  rulesets:
+    image: nginx
+    volumes:
+      - ../rules/:/usr/share/nginx/html:ro
+  site:
+    image: nginx
+    volumes:
+      - ../site/:/usr/share/nginx/html:ro
+    ports:
+      - 80:80
