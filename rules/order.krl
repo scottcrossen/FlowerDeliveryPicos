@@ -1,5 +1,6 @@
 ruleset order {
   meta {
+    use module io.picolabs.wrangler alias wrangler
     logging on
     shares __testing, getCustomerContact, getAssignedDriver
     provides getCustomerContact, getAssignedDriver
@@ -30,6 +31,12 @@ ruleset order {
     getAssignedDriver = function() {
       ent:assignedDriver.defaultsTo(defaultAssignedDriver);
     }
+    getOrderId = function() {
+      ent:orderId.defaultsTo(null);
+    }
+    getParentEci = function() {
+      ent:parentEci.defaultsTo(null);
+    }
   }
 
   rule driver_updated {
@@ -42,6 +49,8 @@ ruleset order {
       bid = event:attr("bid").defaultsTo(getAssignedDriver(){"bid"})
       requireBid = event:attr("requireBid").defaultsTo(getAssignedDriver(){"requireBid"})
       driverEci = event:attr("driverEci").defaultsTo(getAssignedDriver(){"driverEci"})
+      orderId = event:attr("orderId").defaultsTo(getOrderId())
+      parentEci = event:attr("parentEci").defaultsTo(getParentEci())
     }
     fired {
       ent:customerContact := {
@@ -54,7 +63,9 @@ ruleset order {
         "bid": bid,
         "requireBid": requireBid,
         "eci": driverEci
-      }
+      };
+      ent:orderId := orderId;
+      ent:parentEci := parentEci;
     }
   }
 
@@ -86,13 +97,42 @@ ruleset order {
   }
 
   rule assign {
-    select when order assign
-    // TODO: this
+    select when order assign where ent:assignedDriver{"bid"} >= 0
+    pre {
+      driverEci = getAssignedDriver(){"eci"}.klog("flag 1.1")
+      orderId = getOrderId().klog("flag 1.2")
+    }
+    event:send({
+      "eci": driverEci,
+      "domain": "driver",
+      "type": "order_assigned",
+      "attrs": {
+        "eci": meta:eci,
+        "orderId": orderId
+      }
+    })
   }
 
+  rule assign_fail {
+    select when order assign where ent:assignedDriver{"bid"} < 0
+    fired {
+      schedule order event assign at time:add(time:now(), {"seconds": 5})
+    }
+  }
 
   rule fulfilled {
     select when order fulfilled
-    // TODO: this
+    pre {
+      parent_eci = getParentEci()
+      orderId = getOrderId()
+    }
+    event:send({
+      "eci": parent_eci,
+      "domain": "store",
+      "type": "complete_order",
+      "attrs": {
+        "orderId": orderId
+      }
+    })
   }
 }

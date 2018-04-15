@@ -12,8 +12,8 @@ ruleset store {
         "name": "getOrders"
       } ],
       "events": [ {
-        "domain": "order",
-        "type": "new",
+        "domain": "store",
+        "type": "new_order",
         "attrs": [ "name", "phoneNumber", "flowerType" ]
       }, {
         "domain": "store",
@@ -63,7 +63,7 @@ ruleset store {
   }
 
   rule new_order {
-    select when order new
+    select when store new_order
     pre {
       orderId = random:uuid()
       contactName = event:attr("name").defaultsTo(null)
@@ -74,7 +74,8 @@ ruleset store {
       raise wrangler event "child_creation" attributes {
         "name": "Order " + orderId.as("String"),
         "color": "#0000ff",
-        "orderId": "orderId",
+        "orderId": orderId,
+        "parentEci": meta:eci,
         "contactName": contactName,
         "contactPhoneNumber": contactPhoneNumber,
         "contactFlowerType": contactFlowerType
@@ -87,6 +88,7 @@ ruleset store {
     pre {
       eci = event:attr("eci")
       orderId = event:attr("rs_attrs"){"orderId"}
+      parentEci = event:attr("rs_attrs"){"parentEci"}
       contactName = event:attr("rs_attrs"){"contactName"}
       contactPhoneNumber = event:attr("rs_attrs"){"contactPhoneNumber"}
       contactFlowerType = event:attr("rs_attrs"){"contactFlowerType"}
@@ -107,6 +109,7 @@ ruleset store {
       raise store event "subscribe_to_child" attributes {
         "eci": eci,
         "orderId": orderId,
+        "parentEci": parentEci,
         "contactName": contactName,
         "contactPhoneNumber": contactPhoneNumber,
         "contactFlowerType": contactFlowerType
@@ -144,6 +147,7 @@ ruleset store {
     pre {
       eci = event:attr("eci")
       orderId = event:attr("orderId")
+      parentEci = event:attr("parentEci")
       contactName = event:attr("contactName")
       contactPhoneNumber = event:attr("contactPhoneNumber")
       contactFlowerType = event:attr("contactFlowerType")
@@ -157,7 +161,9 @@ ruleset store {
         "requireBid": requireBid,
         "customerName": contactName,
         "phoneNumber": contactPhoneNumber,
-        "flowerType": contactFlowerType
+        "flowerType": contactFlowerType,
+        "orderId": orderId,
+        "parentEci": parentEci
       }
     })
     fired {
@@ -217,5 +223,17 @@ ruleset store {
       "domain": "order",
       "type": "assign"
     })
+  }
+
+  rule complete_order {
+    select when store complete_order
+    pre {
+      orderId = event:attr("orderId")
+    }
+    fired {
+      raise wrangler event "child_deletion" attributes {
+        "name": "Order " + orderId.as("String")
+      }
+    }
   }
 }

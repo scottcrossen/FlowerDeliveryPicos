@@ -2,13 +2,18 @@ ruleset driver {
   meta {
     use module driver_profile alias profile
     logging on
-    shares __testing
+    shares __testing, getAssignedOrders
   }
 
   global {
     __testing = {
       "queries": [ {
         "name": "getAssignedOrders"
+      } ],
+      "events": [ {
+        "domain": "driver",
+        "type": "order_fulfilled",
+        "attrs": [ "orderId" ]
       } ]
     }
     getAssignedOrders = function() {
@@ -100,10 +105,11 @@ ruleset driver {
   rule order_assigned {
     select when driver order_assigned
     pre {
-      eci = event:attr("eci")
-      orderId = event:attr("orderId")
+      eci = event:attr("eci").klog("flag 2.1")
+      orderId = event:attr("orderId").klog("flag 2.2")
     }
     fired {
+      ent:assignedOrders := ent:assignedOrders.defaultsTo({});
       ent:assignedOrders{[orderId]} := eci
     }
   }
@@ -112,7 +118,7 @@ ruleset driver {
     select when driver order_fulfilled
     pre {
       orderId = event:attr("orderId")
-      orderEci = getAssignedOrders(){"orderId"}.defaultsTo(null)
+      orderEci = getAssignedOrders(){[orderId]}.defaultsTo(null)
     }
     if orderEci != null
     then
