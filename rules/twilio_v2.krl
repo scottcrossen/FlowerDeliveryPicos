@@ -20,7 +20,7 @@ ruleset twilio_v2 {
          "?PageSize=" + ((pageSize == "" || pageSize == null) => "50" | pageSize) +
          ((page == "" || page == null) => "" | "&Page=" + page) +
          ((to == "" || to == null) => "" | "&To=" + to) +
-         ((from == "" || to == null) => "" | "&From=" + from)).klog("full message query:");
+         ((from == "" || to == null) => "" | "&From=" + from));
        http:get(full_query)
     }
   }

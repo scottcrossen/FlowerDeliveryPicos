@@ -106,8 +106,8 @@ ruleset order {
   rule assign {
     select when order assign where ent:assignedDriver{"bid"} >= 0
     pre {
-      driverEci = getAssignedDriver(){"eci"}.klog("flag 1.1")
-      orderId = getOrderId().klog("flag 1.2")
+      driverEci = getAssignedDriver(){"eci"}
+      orderId = getOrderId()
     }
     event:send({
       "eci": driverEci,

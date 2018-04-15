@@ -105,8 +105,8 @@ ruleset driver {
   rule order_assigned {
     select when driver order_assigned
     pre {
-      eci = event:attr("eci").klog("flag 2.1")
-      orderId = event:attr("orderId").klog("flag 2.2")
+      eci = event:attr("eci")
+      orderId = event:attr("orderId")
     }
     fired {
       ent:assignedOrders := ent:assignedOrders.defaultsTo({});
