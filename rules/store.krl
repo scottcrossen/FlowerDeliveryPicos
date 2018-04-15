@@ -14,7 +14,7 @@ ruleset store {
       "events": [ {
         "domain": "store",
         "type": "new_order",
-        "attrs": [ "name", "phoneNumber", "flowerType" ]
+        "attrs": [ "name", "phoneNumber", "flowerType", "requestedTime", "requiredTime" ]
       }, {
         "domain": "store",
         "type": "add_driver",
@@ -69,6 +69,8 @@ ruleset store {
       contactName = event:attr("name").defaultsTo(null)
       contactPhoneNumber = event:attr("phoneNumber").defaultsTo(null)
       contactFlowerType = event:attr("flowerType").defaultsTo(null)
+      contactRequestedTime = event:attr("requestedTime").defaultsTo(null)
+      contactRequiredTime = event:attr("requiredTime").defaultsTo(null)
     }
     fired {
       raise wrangler event "child_creation" attributes {
@@ -78,7 +80,9 @@ ruleset store {
         "parentEci": meta:eci,
         "contactName": contactName,
         "contactPhoneNumber": contactPhoneNumber,
-        "contactFlowerType": contactFlowerType
+        "contactFlowerType": contactFlowerType,
+        "contactRequestedTime": contactRequestedTime,
+        "contactRequiredTime": contactRequiredTime
       } if contactName != null && contactPhoneNumber != null && contactFlowerType != null;
     }
   }
@@ -92,6 +96,8 @@ ruleset store {
       contactName = event:attr("rs_attrs"){"contactName"}
       contactPhoneNumber = event:attr("rs_attrs"){"contactPhoneNumber"}
       contactFlowerType = event:attr("rs_attrs"){"contactFlowerType"}
+      contactRequestedTime = event:attr("rs_attrs"){"contactRequestedTime"}
+      contactRequiredTime = event:attr("rs_attrs"){"contactRequiredTime"}
     }
     event:send({
       "eci": eci,
@@ -112,7 +118,9 @@ ruleset store {
         "parentEci": parentEci,
         "contactName": contactName,
         "contactPhoneNumber": contactPhoneNumber,
-        "contactFlowerType": contactFlowerType
+        "contactFlowerType": contactFlowerType,
+        "contactRequestedTime": contactRequestedTime,
+        "contactRequiredTime": contactRequiredTime
       } on final
     }
   }
@@ -151,6 +159,8 @@ ruleset store {
       contactName = event:attr("contactName")
       contactPhoneNumber = event:attr("contactPhoneNumber")
       contactFlowerType = event:attr("contactFlowerType")
+      contactRequestedTime = event:attr("contactRequestedTime")
+      contactRequiredTime = event:attr("contactRequiredTime")
       requireBid = profile:getProfile(){"requireBid"}
     }
     event:send({
@@ -162,6 +172,8 @@ ruleset store {
         "customerName": contactName,
         "phoneNumber": contactPhoneNumber,
         "flowerType": contactFlowerType,
+        "requestedTime": contactRequestedTime,
+        "requiredTime": contactRequiredTime,
         "orderId": orderId,
         "parentEci": parentEci
       }

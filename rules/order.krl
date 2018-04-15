@@ -17,7 +17,9 @@ ruleset order {
     defaultCustomerContact = {
       "name": null,
       "phoneNumber": null,
-      "flowerType": null
+      "flowerType": null,
+      "requestedTime": null,
+      "requiredTime": null
     }
     defaultAssignedDriver = {
       "name": null,
@@ -45,6 +47,8 @@ ruleset order {
       customerName = event:attr("customerName").defaultsTo(getCustomerContact(){"name"})
       number = event:attr("phoneNumber").defaultsTo(getCustomerContact(){"phoneNumber"})
       flowerType = event:attr("flowerType").defaultsTo(getCustomerContact(){"flowerType"})
+      requestedTime = event:attr("requestedTime").defaultsTo(getCustomerContact(){"requestedTime"})
+      requiredTime = event:attr("requiredTime").defaultsTo(getCustomerContact(){"requiredTime"})
       driverName = event:attr("driverName").defaultsTo(getAssignedDriver(){"name"})
       bid = event:attr("bid").defaultsTo(getAssignedDriver(){"bid"})
       requireBid = event:attr("requireBid").defaultsTo(getAssignedDriver(){"requireBid"})
@@ -56,7 +60,9 @@ ruleset order {
       ent:customerContact := {
         "name": customerName,
         "phoneNumber": number,
-        "flowerType": flowerType
+        "flowerType": flowerType,
+        "requestedTime": requestedTime,
+        "requiredTime": requiredTime
       };
       ent:assignedDriver := {
         "name": driverName,
