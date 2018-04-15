@@ -2,11 +2,15 @@ ruleset store {
   meta {
     use module store_profile alias profile
     logging on
-    shares __testing
+    shares __testing, getOrders, getKnownDrivers
   }
 
   global {
     __testing = {
+      "queries": [ {
+        "name": "getKnownDrivers",
+        "name": "getOrders"
+      } ],
       "events": [ {
         "domain": "order",
         "type": "new",
@@ -19,6 +23,9 @@ ruleset store {
     }
     getKnownDrivers = function() {
       ent:drivers.defaultsTo([])
+    }
+    getOrders = function() {
+      ent:orders.defaultsTo([])
     }
   }
 
@@ -46,6 +53,7 @@ ruleset store {
       ent:drivers := getKnownDrivers().append(driverEci)
     }
   }
+
   rule auto_accept {
     select when wrangler inbound_pending_subscription_added
     fired {
@@ -63,16 +71,14 @@ ruleset store {
       contactFlowerType = event:attr("flowerType").defaultsTo(null)
     }
     fired {
-      raise wrangler event "child_creation"
-        attributes {
-          "name": "Order " + orderId.as("String"),
-          "color": "#0000ff",
-          "orderId": "orderId",
-          "contactName": contactName,
-          "contactPhoneNumber": contactPhoneNumber,
-          "contactFlowerType": contactFlowerType
-        } if contactName != null && contactPhoneNumber != null && contactFlowerType != null;
-      ent:currentChildId := nextId
+      raise wrangler event "child_creation" attributes {
+        "name": "Order " + orderId.as("String"),
+        "color": "#0000ff",
+        "orderId": "orderId",
+        "contactName": contactName,
+        "contactPhoneNumber": contactPhoneNumber,
+        "contactFlowerType": contactFlowerType
+      } if contactName != null && contactPhoneNumber != null && contactFlowerType != null;
     }
   }
 
@@ -98,15 +104,38 @@ ruleset store {
       }
     });
     fired {
-      ent:orders := ent:orders.defaultsTo({});
-      ent:orders{orderId} := eci;
-      raise store event "set_order_info" attributes {
+      raise store event "subscribe_to_child" attributes {
         "eci": eci,
         "orderId": orderId,
         "contactName": contactName,
         "contactPhoneNumber": contactPhoneNumber,
         "contactFlowerType": contactFlowerType
       } on final
+    }
+  }
+
+  rule subscribe_to_child {
+    select when store subscribe_to_child
+    pre {
+      eci = event:attr("eci")
+      orderId = event:attr("orderId")
+    }
+    event:send({
+      "eci": eci,
+      "domain": "wrangler",
+      "type": "subscription",
+      "attrs": {
+        "name": "Store/Order Connection",
+        "Rx_role": "store",
+        "Tx_role": "order",
+        "channel_type": "subscription",
+        "wellKnown_Tx": meta:eci
+      }
+    })
+    fired {
+      ent:orders := ent:orders.defaultsTo({});
+      ent:orders{[orderId]} := eci;
+      raise store event "set_order_info" attributes event:attrs on final
     }
   }
 
@@ -150,7 +179,7 @@ ruleset store {
         "eci": eci,
         "orderId": orderId
       };
-      schedule store event "fulfill_order" at time:add(time:now(), {"seconds": 5}) attributes {
+      schedule store event "assign_order" at time:add(time:now(), {"seconds": 5}) attributes {
         "eci": eci,
         "orderId": orderId
       }
@@ -174,6 +203,19 @@ ruleset store {
         "orderId": orderId,
         "minRating": minRating
       }
+    })
+  }
+
+  rule assign_order {
+    select when store assign_order
+    pre {
+      eci = event:attr("eci")
+      orderId = event:attr("orderId")
+    }
+    event:send({
+      "eci": eci,
+      "domain": "order",
+      "type": "assign"
     })
   }
 }

@@ -21,7 +21,8 @@ ruleset order {
     defaultAssignedDriver = {
       "name": null,
       "bid": -1,
-      "requireBid": false
+      "requireBid": false,
+      "eci": null
     }
     getCustomerContact = function() {
       ent:customerContact.defaultsTo(defaultCustomerContact);
@@ -40,6 +41,7 @@ ruleset order {
       driverName = event:attr("driverName").defaultsTo(getAssignedDriver(){"name"})
       bid = event:attr("bid").defaultsTo(getAssignedDriver(){"bid"})
       requireBid = event:attr("requireBid").defaultsTo(getAssignedDriver(){"requireBid"})
+      driverEci = event:attr("driverEci").defaultsTo(getAssignedDriver(){"driverEci"})
     }
     fired {
       ent:customerContact := {
@@ -50,7 +52,8 @@ ruleset order {
       ent:assignedDriver := {
         "name": driverName,
         "bid": bid,
-        "requireBid": requireBid
+        "requireBid": requireBid,
+        "eci": driverEci
       }
     }
   }
@@ -58,16 +61,38 @@ ruleset order {
   rule bid {
     select when order bid
     pre {
-      driverName = event:attr("driverName").defaultsTo(null)
+      driverName = event:attr("driverName").defaultsTo(null).as("String")
       bid = event:attr("bid").defaultsTo(-1)
-      currentBid = getAssignedDriver(){"bid"}
-      requireBid = getAssignedDriver(){"requireBid"}
+      driverEci = event:attr("driverEci").defaultsTo(null)
+      currentBid = getAssignedDriver(){"bid"}.as("Number")
+      requireBid = getAssignedDriver(){"requireBid"}.as("Boolean")
     }
     fired {
       ent:assignedDriver := {
         "name": driverName,
-        "bid": bid
-      } if (currentBid == -1 || requireBid) && bid > currentBid && driverName != null
+        "bid": bid,
+        "requireBid": requireBid,
+        "eci": driverEci
+      } if (currentBid == -1 || requireBid) && bid > currentBid && driverName != null && driverEci != null
     }
+  }
+
+  rule auto_accept {
+    select when wrangler inbound_pending_subscription_added
+    fired {
+      raise wrangler event "pending_subscription_approval"
+      attributes event:attrs
+    }
+  }
+
+  rule assign {
+    select when order assign
+    // TODO: this
+  }
+
+
+  rule fulfilled {
+    select when order fulfilled
+    // TODO: this
   }
 }

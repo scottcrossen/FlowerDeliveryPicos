@@ -19,7 +19,11 @@ ruleset store_profile {
     defaultRequireBid = false
     defaultMinRating = 3
     getProfile = function() {
-      ent:profile.defaultsTo({"requireBid": defaultRequireBid, "minRating": defaultMinRating});
+      ent:profile.defaultsTo({
+      "requireBid": defaultRequireBid,
+      "minRating": defaultMinRating,
+      "name": "N/A"
+      });
     }
   }
   rule profile_update {
@@ -27,9 +31,10 @@ ruleset store_profile {
     pre {
       requireBid = event:attr("requireBid").defaultsTo(getProfile(){"requireBid"})
       minRating = event:attr("minRating").defaultsTo(getProfile(){"minRating"})
+      name = event:attr("name").defaultsTo(getProfile(){"name"})
     }
     fired {
-      ent:profile := {"requireBid": requireBid, "minRating": minRating}
+      ent:profile := {"requireBid": requireBid, "minRating": minRating, "name": name}
     }
   }
 }

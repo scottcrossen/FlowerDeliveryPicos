@@ -29,7 +29,7 @@ ruleset gossip {
       }, {
         "domain": "gossip",
         "type": "create_rumor",
-        "attrs": [ "SensorID", "Temperature" ]
+        "attrs": [ "originId", "messageContent" ]
       }, {
         "domain": "gossip",
         "type": "link_nodes",
@@ -57,7 +57,7 @@ ruleset gossip {
       // Select all "node" subscriptions
       possible_peers = Subscriptions:established("Tx_role","node").filter(function(subscription) {
         // filter based on criteria given in lab
-        ent:peers{engine:getPicoIDByECI(subscription{"Tx"})} == ent:peers{meta:picoId}
+        ent:peers{engine:getPicoIdByECI(subscription{"Tx"})} == ent:peers{meta:picoId}
         // Really this needs to be replaced with a "firstOption" but not everything is Scala.
       });
       // Return first valid but handle the 0 length case differently
@@ -213,10 +213,10 @@ ruleset gossip {
     fired {
       // Add rumor to entitiy. The 'Rumor' rule will handle the rest
       ent:rumors{[meta:picoId, ent:currentSequence]} := {
-        "MessageID": meta:picoId + ":" + ent:currentSequence,
-        "SensorID": event:attr("SensorID"),
-        "Temperature": event:attr("Temperature"),
-        "Timestamp": time:now()
+        "messageId": meta:picoId + ":" + ent:currentSequence,
+        "originId": event:attr("originId"),
+        "messageContent": event:attr("messageContent"),
+        "timestamp": time:now()
       };
       ent:peers{[meta:picoId, meta:picoId]} := ent:currentSequence;
       // Updating the sequence is important too.
@@ -228,15 +228,18 @@ ruleset gossip {
     select when gossip rumor
     pre {
       message = event:attr("message")
-      message_ids = message{"MessageID"}.split(":")
+      message_ids = message{"messageId"}.split(":")
       pico_id = message_ids[0]
       sequence_number = message_ids[1].as("Number")
       receiving_eci = event:attr("eci")
-      receiving_pico_id = engine:getPicoIDByECI(receiving_eci)
+      receiving_pico_id = engine:getPicoIdByECI(receiving_eci)
     }
     fired {
       // Set entities on update
       ent:rumors{[pico_id, sequence_number]} := message if pico_id != "null";
+      raise gossip event "new_rumor" attributes {
+        "message": message
+      } if pico_id != "null";
       ent:peers{[pico_id, pico_id]} := sequence_number if pico_id != "null";
       ent:peers{[meta:picoId, pico_id]} := sequence_number if pico_id != "null";
       ent:peers{[receiving_pico_id, pico_id]} := sequence_number if pico_id != "null";

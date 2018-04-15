@@ -13,19 +13,20 @@ ruleset driver_profile {
       "events": [ {
         "domain": "driver_profile",
         "type": "update",
-        "attrs": [ "rating", "automaticBid", "automaticBidAmount", "simulateDeliveryWait" ]
+        "attrs": [ "rating", "automaticBid", "automaticBidAmount", "carryingCapacity" ]
       } ]
     }
     defaultRating = 3
     defaultAutomaticBid = true
     defaultAutomaticBidAmount = 3.00
-    defaultSimulateDeliveryWait = 10.00
+    defaultCarryingCapacity = 10
     getProfile = function() {
       ent:profile.defaultsTo({
         "rating": defaultRating,
         "automaticBid": defaultAutomaticBid,
         "automaticBidAmount": defaultAutomaticBidAmount,
-        "simulateDeliveryWait": defaultSimulateDeliveryWait
+        "carryingCapacity": defaultCarryingCapacity,
+        "name": "N/A"
       });
     }
   }
@@ -35,13 +36,16 @@ ruleset driver_profile {
       rating = event:attr("rating").defaultsTo(getProfile(){"rating"})
       automaticBid = event:attr("automaticBid").defaultsTo(getProfile(){"automaticBid"})
       automaticBidAmount = event:attr("automaticBidAmount").defaultsTo(getProfile(){"automaticBidAmount"})
+      carryingCapacity = event:attr("carryingCapacity").defaultsTo(getProfile(){"carryingCapacity"})
+      name = event:attr("name").defaultsTo(getProfile(){"name"})
     }
     fired {
       ent:profile := {
         "rating": rating,
         "automaticBid": automaticBid,
         "automaticBidAmount": automaticBidAmount,
-        "simulateDeliveryWait": simulateDeliveryWait
+        "carryingCapacity": carryingCapacity,
+        "name": name
       }
     }
   }
