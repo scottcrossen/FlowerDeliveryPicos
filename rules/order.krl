@@ -1,6 +1,7 @@
 ruleset order {
   meta {
     use module io.picolabs.wrangler alias wrangler
+    use module use_twilio_v2
     logging on
     shares __testing, getCustomerContact, getAssignedDriver
     provides getCustomerContact, getAssignedDriver
@@ -117,6 +118,17 @@ ruleset order {
         "orderId": orderId
       }
     })
+    fired {
+      raise sms event "new_message" attributes {
+        "to": getCustomerContact(){"phoneNumber"},
+        "message": getCustomerContact(){"name"}.as("String") +
+          "; Your " +
+          getCustomerContact(){"flowerType"}.as("String") +
+          " are expected to arrive by the required time of " +
+          getCustomerContact(){"requiredTime"}.as("String") +
+          "."
+      }
+    }
   }
 
   rule assign_fail {
@@ -140,5 +152,13 @@ ruleset order {
         "orderId": orderId
       }
     })
+    fired {
+      raise sms event "new_message" attributes {
+        "to": getCustomerContact(){"phoneNumber"},
+        "message": getCustomerContact(){"name"}.as("String") +
+          "; Thanks for using our flower service!"
+      }
+      // TODO: Trevor: Make call to other API
+    }
   }
 }
