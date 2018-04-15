@@ -158,7 +158,8 @@ ruleset order {
         "message": getCustomerContact(){"name"}.as("String") +
           "; Thanks for using our flower service!"
       }
-      // TODO: Trevor: Make call to other API
+      // TODO: Trevor: Make call to other API 
+      // Trevor: DONE
       raise zoho event "report" attributes {
         "cust_name" = getCustomerContact(){"name"},
         "cust_phone" = getCustomerContact(){"phoneNumber"},
