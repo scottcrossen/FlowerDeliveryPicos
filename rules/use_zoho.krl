@@ -4,12 +4,14 @@ ruleset use_zoho {
         use module zoho_sheets alias zoho
             with    auth_token = keys:zoho("auth_token")
                     email = keys:zoho("email")
-        provides report_ZOHO
-        shares __testing, report_ZOHO
+        shares __testing
     }
 
     global {
-        
+        __testing = {
+            "queries": [],
+            "events": [ {"domain":"order", "type":"report", "attrs": ["cust_name","cust_phone","flwr_type","driver","bid"]}]
+        }
     }
 
     rule report {
