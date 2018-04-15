@@ -159,6 +159,13 @@ ruleset order {
           "; Thanks for using our flower service!"
       }
       // TODO: Trevor: Make call to other API
+      raise zoho event "report" attributes {
+        "cust_name" = getCustomerContact(){"name"},
+        "cust_phone" = getCustomerContact(){"phoneNumber"},
+        "flwr_type" = getCustomerContact(){"flowerType"},
+        "driver" = getAssignedDriver(){"name"},
+        "bid = getAssignedDriver(){"bid"}
+      }
     }
   }
 }

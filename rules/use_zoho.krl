@@ -15,7 +15,7 @@ ruleset use_zoho {
     }
 
     rule report {
-        select when order report {
+        select when zoho report {
             pre {
                 tstamp = time:now()
                 cust_name = event:attr("cust_name")

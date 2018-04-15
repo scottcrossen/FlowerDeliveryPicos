@@ -110,8 +110,11 @@ ruleset store {
           "order",
           "twilio_keys",
           "use_twilio_v2",
-          "twilio_v2"
-          // TODO: Trevor: Add your API ruleset here.
+          "twilio_v2",
+          "use_zoho",
+          "zoho_keys",
+          "zoho"
+          // TODO: Trevor: Add your API ruleset here. DONE
         ]
       }
     });
