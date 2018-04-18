@@ -157,15 +157,13 @@ ruleset order {
         "to": getCustomerContact(){"phoneNumber"},
         "message": getCustomerContact(){"name"}.as("String") +
           "; Thanks for using our flower service!"
-      }
-      // TODO: Trevor: Make call to other API 
-      // Trevor: DONE
+      };
       raise zoho event "report" attributes {
-        "cust_name" = getCustomerContact(){"name"},
-        "cust_phone" = getCustomerContact(){"phoneNumber"},
-        "flwr_type" = getCustomerContact(){"flowerType"},
-        "driver" = getAssignedDriver(){"name"},
-        "bid = getAssignedDriver(){"bid"}
+        "cust_name": getCustomerContact(){"name"},
+        "cust_phone": getCustomerContact(){"phoneNumber"},
+        "flwr_type": getCustomerContact(){"flowerType"},
+        "driver": getAssignedDriver(){"name"},
+        "bid": getAssignedDriver(){"bid"}
       }
     }
   }

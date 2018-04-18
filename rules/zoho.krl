@@ -1,7 +1,7 @@
 ruleset zoho {
 
     meta {
-        configure using 
+        configure using
                 auth_token = ""
                 email = ""
         provides report_ZOHO
@@ -17,11 +17,11 @@ ruleset zoho {
             tblname = "FlowerOrders"
             url = "https://reportsapi.zoho.com/api/"+email + "/" + dbname+ "/" + tblname
             params = "?ZOHO_ACTION=ADDROW&ZOHO_OUTPUT_FORMAT=JSON&ZOHO_ERROR_FORMAT=JSON&ZOHO_API_VERSION=1.0&authtoken="+auth_token+
-                        "&Time="+tstamp+"&CustomerName="+cust_name+"&CustomerPhone="+cust_phone+"&FlowerType="+flwr_type+"&AssignedDriver="+driver+"&Bid="bid;
+                        "&Time="+tstamp+"&CustomerName="+cust_name+"&CustomerPhone="+cust_phone+"&FlowerType="+flwr_type+"&AssignedDriver="+driver+"&Bid="+bid;
             http:post(url + params)
         }
 
-        __testing = { "queries": [ {"name":"report_ZOHO}],
+        __testing = { "queries": [ {"name":"report_ZOHO"}],
                       "events" : []}
     }
 }
