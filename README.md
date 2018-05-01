@@ -1,4 +1,4 @@
-# PicoFlowerDelivery
+# Pico Flower Delivery
 
 A project designed to solve the flower delivery problem for the BYU class titled 'BYU CS 462'
 
@@ -32,7 +32,7 @@ To start your *Flower Delivery* app:
 ### Contributors
 
 1. Scott Leland Crossen  
-<http://scottcrossen42.com>  
+<http://scottcrossen.com>  
 <scottcrossen42@gmail.com>  
 2. Trevor Rydalch  
 <https://github.com/trydalch>
